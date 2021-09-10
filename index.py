@@ -13,6 +13,9 @@ import sounddevice as sd
 from scipy.io.wavfile import write
 from timeit import default_timer
 import time
+import datetime
+from pathlib import Path
+import math 
 
 keyboard_controller = Controller()
 
@@ -23,6 +26,9 @@ myrecording = None
 start = None
 
 model = SentenceTransformer('all-MiniLM-L6-v2')
+
+commandRegex = re.compile(r'^([0-9]+)\s([A-Z0-9\W]+?)$', re.MULTILINE)
+
 
 
 # Turn the Blue button background to white
@@ -44,17 +50,14 @@ def with_speech(understood_speech):
 
     app = Application(backend="uia").connect(title_re=".*Microsoft Flight Simulator.*")
     atc_image = app.window(handle=pywinauto.findwindows.find_window(title="ATC")).capture_as_image()
-    process_screenshot(atc_image).save("./atc.png", "PNG")
+    proccessed_atc_image = process_screenshot(atc_image)
+    proccessed_atc_image.save(Path('.') / "atc-archive" / (str(math.floor(datetime.datetime.now().timestamp())) + ".png"), "PNG")
+    atc1 = pytesseract.image_to_string(proccessed_atc_image, lang='eng', config=r'--psm 6')
 
-    atc1 = pytesseract.image_to_string(Image.open('atc.png'), lang='eng', config=r'--psm 6')
 
 
-    p = re.compile(r'^([0-9]+)\s([A-Z0-9\W]+?)$', re.MULTILINE)
-
-    matches = p.findall(atc1)
-    
-
-    print(atc1)
+    matches = commandRegex.findall(atc1)
+    print("found matches")
     
     if(len(matches) == 0):
         print("No matches")
@@ -81,10 +84,10 @@ def with_speech(understood_speech):
             command_number = match[0]
 
 
-    print(command_number + ". " + command)
+    print("Selected " + command_number + ". " + command)
     print("Press " + str(command_number))
     keyboard_controller.press(command_number)
-    time.sleep(0.2)
+    time.sleep(0.1)
     keyboard_controller.release(command_number)
 
     recording = False
