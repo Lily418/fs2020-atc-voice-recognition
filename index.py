@@ -6,13 +6,13 @@ import azure.cognitiveservices.speech as speechsdk
 from sentence_transformers import SentenceTransformer, util
 import os
 from pywinauto.application import Application
-from pynput import mouse, keyboard
+from pynput import keyboard
 from pynput.keyboard import Key, Controller
 import pywinauto
 import sounddevice as sd
 from scipy.io.wavfile import write
 from timeit import default_timer
-import math
+import time
 
 keyboard_controller = Controller()
 
@@ -27,7 +27,7 @@ model = SentenceTransformer('all-MiniLM-L6-v2')
 
 # Turn the Blue button background to white
 def process_screenshot(screenshot): 
-    atc_invert = ImageOps.invert(atc_image)
+    atc_invert = ImageOps.invert(screenshot)
     width = atc_invert.size[0] 
     height = atc_invert.size[1] 
 
@@ -36,6 +36,7 @@ def process_screenshot(screenshot):
             data = atc_invert.getpixel((i,j))
             if data[0] == 255 and data[1] == 75 and data[2] == 0:
                 atc_invert.putpixel((i,j),(255, 255, 255))
+    return atc_invert
     
 
 def with_speech(understood_speech):
@@ -63,16 +64,6 @@ def with_speech(understood_speech):
         recording = False
         return None
 
-    # def from_file():
-    #     speech_config = speechsdk.SpeechConfig(subscription=os.environ["AZURE_FS2020_ATC_SPEECH_KEY"], region="uksouth")
-    #     audio_input = speechsdk.AudioConfig(filename="output.wav")
-    #     speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, audio_config=audio_input)
-        
-    #     result = speech_recognizer.recognize_once_async().get()
-    #     print(result)
-    #     print(result.text)
-    #     return result.text
-
 
     voice = understood_speech
     voice_embeddings = model.encode([voice])
@@ -96,6 +87,7 @@ def with_speech(understood_speech):
     print(command_number + ". " + command)
     print("Press " + str(command_number))
     keyboard_controller.press(command_number)
+    time.sleep(0.2)
     keyboard_controller.release(command_number)
 
     recording = False
