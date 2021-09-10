@@ -25,12 +25,25 @@ start = None
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
 
+# Turn the Blue button background to white
+def process_screenshot(screenshot): 
+    atc_invert = ImageOps.invert(atc_image)
+    width = atc_invert.size[0] 
+    height = atc_invert.size[1] 
+
+    for i in range(0,width):
+        for j in range(0,height):
+            data = atc_invert.getpixel((i,j))
+            if data[0] == 255 and data[1] == 75 and data[2] == 0:
+                atc_invert.putpixel((i,j),(255, 255, 255))
+    
+
 def with_speech(understood_speech):
     global recording
 
     app = Application(backend="uia").connect(title_re=".*Microsoft Flight Simulator.*")
     atc_image = app.window(handle=pywinauto.findwindows.find_window(title="ATC")).capture_as_image()
-    ImageOps.invert(atc_image).save("./atc.png", "PNG")
+    process_screenshot(atc_image).save("./atc.png", "PNG")
 
     atc1 = pytesseract.image_to_string(Image.open('atc.png'), lang='eng', config=r'--psm 6')
 
