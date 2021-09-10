@@ -1,14 +1,11 @@
-try:
-    from PIL import Image
-except ImportError:
-    import Image
+from PIL import Image
 import pytesseract
 
 import re
 import azure.cognitiveservices.speech as speechsdk
-from Levenshtein import distance as lev
 from sentence_transformers import SentenceTransformer, util
 import os
+from pywinauto.application import Application
 
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
