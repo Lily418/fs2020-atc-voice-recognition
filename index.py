@@ -48,12 +48,9 @@ def with_speech(understood_speech):
 
     atc1 = pytesseract.image_to_string(Image.open('atc.png'), lang='eng', config=r'--psm 6')
 
-    # print(pytesseract.get_languages(config=''))
 
     p = re.compile(r'^([0-9]+)\s([A-Z0-9\W]+?)$', re.MULTILINE)
 
-    # print(atc1)
-    # print("-----")
     matches = p.findall(atc1)
     
 
@@ -113,19 +110,6 @@ def on_press(key):
     except AttributeError:
         print('special key {0} pressed'.format(
             key))
-
-# def on_release(key):
-#     return None
-#     if key == keyboard.Key.f8:
-#         # Stop listener
-#         sd.stop()
-#         global start
-#         duration = default_timer() - start
-#         print("recording time "  + str(duration))
-#         myrecording_trimmed = myrecording[0:math.ceil(duration * fs)]
-#         write('output.wav', fs, myrecording_trimmed * 20)  # Save as WAV file 
-#         print("wrote output.wav")
-#         return False
 
 # Collect events until released
 with keyboard.Listener(
