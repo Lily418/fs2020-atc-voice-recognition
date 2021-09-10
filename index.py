@@ -12,29 +12,33 @@ import os
 
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
-atc1 = pytesseract.image_to_string(Image.open('ATC4.png'), lang='eng', config=r'--psm 6 -c tessedit_write_images=true')
+atc1 = pytesseract.image_to_string(Image.open('grey-ATC3.png'), lang='eng', config=r'--psm 6')
 # print(pytesseract.image_to_string(Image.open('ATC2.png'), lang='eng', config=r'--psm 6'))
 # print(pytesseract.image_to_string(Image.open('ATC3.png'), lang='eng', config=r'--psm 6'))
 
 # print(pytesseract.get_languages(config=''))
 
+print(atc1)
 
-p = re.compile(r'^([0-9]+)(.*)\b', re.MULTILINE)
+p = re.compile(r'^([0-9]+)\s([A-Z \W]+)\b', re.MULTILINE)
 
 # print(atc1)
 # print("-----")
 matches = p.findall(atc1)
-# print(matches)
+print(matches)
 
 def from_file():
     speech_config = speechsdk.SpeechConfig(subscription=os.environ["AZURE_FS2020_ATC_SPEECH_KEY"], region="uksouth")
-    audio_input = speechsdk.AudioConfig(filename="DepartEast.wav")
+    audio_input = speechsdk.AudioConfig(filename="sayagain.wav")
     speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, audio_config=audio_input)
     
     result = speech_recognizer.recognize_once_async().get()
     print(result.text)
+    return result.text
 
-voice = "Announced takeoff depart East."
+# from_file()
+
+voice = "Say again."
 
 voice_embeddings = model.encode([voice])
 
