@@ -21,7 +21,7 @@ import concurrent.futures
 import json
 
 
-menu_item_map = json.loads(open(Path(".") / "menu_item_map.json",'r', encoding="utf8"))
+menu_item_map = json.loads(open(Path(".") / "menu_item_map.json",'r', encoding="utf8").read())
 
 understood_speech = None
 understood_commands = None
