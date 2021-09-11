@@ -41,14 +41,15 @@ datetimeForLog = None
 
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
-commandRegex = re.compile(r'([0-9]+)\s([A-Z0-9\W]+?)$', re.MULTILINE)
+commandRegex = re.compile(r'^([0-9]+)\s([A-Z0-9\W]+?)$', re.MULTILINE)
 
 app = Application(backend="uia").connect(title_re=".*Microsoft Flight Simulator.*")
 
 
 # Turn the Blue button background to white
 def process_screenshot(screenshot): 
-    atc_invert = ImageOps.invert(screenshot)
+    screenshot_cropped = ImageOps.crop(screenshot, border=18)
+    atc_invert = ImageOps.invert(screenshot_cropped)
     width = atc_invert.size[0] 
     height = atc_invert.size[1] 
 
