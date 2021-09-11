@@ -1,0 +1,19 @@
+OCR_UNDERSTOOD:
+sa
+COM1 |BOURNEM... ERY COM2INot inuse 124.850
+Y ‘ runway 26 using taxiway M TNEcross runway 26 G2 G G2
+G G1 G. Contact tower on 125.605 when ready.
+q 4 BOURNEMOUTH : LILYPAD 418 , QNH 30.03 Wind 252 at
+14. departure to the east approved. Cleared for takeoff
+runway 26
+q BOURNEMOUTH : LILYPAD 418, please acknowledge.
+q 4 BOURNEMOUTH : LILYPAD 418, continue for east
+departure.
+1 ACKNOWLEDGE INDICATION
+2 SAYAGAIN
+
+SPEECH_UNDERSTOOD:
+Continue for East departure. Philip had four and eight.
+ REGEX MATCHES:
+[('1', 'ACKNOWLEDGE INDICATION'), ('2', 'SAYAGAIN')]
+Selected 2. SAYAGAIN
