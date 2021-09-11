@@ -1,0 +1,10 @@
+{
+    "ACKNOWLEDGE INDICATION": [
+        "continue for north departure",
+        "continue for east departure",
+        "continue for south departure",
+        "continue for west departure",
+        "continue for straight out departure"
+    ]
+
+}

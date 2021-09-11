@@ -18,6 +18,10 @@ from pathlib import Path
 import math 
 from threading import Thread
 import concurrent.futures
+import json
+
+
+menu_item_map = json.loads(open(Path(".") / "menu_item_map.json",'r', encoding="utf8").read())
 
 understood_speech = None
 understood_commands = None
@@ -131,14 +135,20 @@ def with_speech_and_matches():
 
     for command in understood_commands:
         print("command" + str(command))
-        command_embeddings = model.encode([command[1].upper()])
-        cosine_scores = util.pytorch_cos_sim(voice_embeddings, command_embeddings)
-        command_score = cosine_scores[0].item()
 
-        if command_score > max_score:
-            command_label = command[1].upper()
-            max_score = command_score
-            command_number = command[0]
+        # For commands like acknowledgement expected speech is dissimilar
+        # from the label text
+        expected_speech = [command[1].upper()] + (menu_item_map[command[1].upper()] or [])
+        expected_speech_embeddings = map(lambda x: model.encode([x]), expected_speech)
+        
+        for expected_speech_embedding in expected_speech_embeddings:
+            cosine_scores = util.pytorch_cos_sim(voice_embeddings, expected_speech_embedding)
+            expected_speech_score = cosine_scores[0].item()
+
+            if expected_speech_score > max_score:
+                command_label = command[1].upper()
+                max_score = expected_speech_score
+                command_number = command[0]
 
     encodeUnderstoodSpeechFinish =  time.perf_counter()
     print(f"Time from encodeUnderstoodSpeech to encodeUnderstoodSpeechFinish {encodeUnderstoodSpeechFinish - encodeUnderstoodSpeech:0.4f} seconds")
