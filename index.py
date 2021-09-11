@@ -41,7 +41,7 @@ datetimeForLog = None
 
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
-commandRegex = re.compile(r'^([0-9]+)\s([A-Z0-9\W]+?)$', re.MULTILINE)
+commandRegex = re.compile(r'^([0-9]+) ([A-Z0-9\W]+?)$', re.MULTILINE)
 
 app = Application(backend="uia").connect(title_re=".*Microsoft Flight Simulator.*")
 
@@ -145,7 +145,7 @@ def with_speech_and_matches():
 
 
     print("Selected " + command_number + ". " + command_label)
-    log_file.write("Selected " + command_number + ". " + command)
+    log_file.write("Selected " + command_number + ". " + command_label)
     log_file.close()
     print("Press " + str(command_number))
 
