@@ -21,6 +21,7 @@ import concurrent.futures
 
 understood_speech = None
 understood_commands = None
+ocr_understood = None
 
 # Code Timers
 pressf8 = None
@@ -36,6 +37,7 @@ fs = 44100  # Sample rate
 seconds = 30  # Duration of recording
 myrecording = None
 start = None
+datetimeForLog = None
 
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
@@ -69,7 +71,8 @@ def get_commands():
     
     print(f"Time from proccessScreenshotTime to endProccessScreenshotTime {endProccessScreenshotTime - proccessScreenshotTime:0.4f} seconds")
 
-    atc_image.save(Path('.') / "atc-archive" / (str(math.floor(datetime.datetime.now().timestamp())) + ".png"), "PNG")
+    global datetimeForLog 
+    atc_image.save(Path('.') / "atc-archive" / (str(datetimeForLog) + ".png"), "PNG")
 
     ocrStart = time.perf_counter()
     atc1 = pytesseract.image_to_string(proccessed_atc_image, lang='eng', config=r'--psm 6')
@@ -86,6 +89,8 @@ def get_commands():
     matchescreatedtime = time.perf_counter()
     print(f"Time from ocr understood time to matchescreatedtime {matchescreatedtime - ocrunderstoodtime:0.4f} seconds")
 
+    global ocr_understood
+    ocr_understood = atc1
     global understood_commands
     understood_commands = matches
     
@@ -93,14 +98,16 @@ def get_commands():
 def with_speech_and_matches():
     global understood_speech
     global understood_commands
+    global ocr_understood
     global recording
 
     print("understood_speech" + understood_speech)
 
     
 
-    # log_file = open(Path('.') / "atc-archive" / (str(math.floor(datetime.datetime.now().timestamp())) + ".txt"),'w')
-    # log_file.write("OCR_UNDERSTOOD:\n" + atc1 + "\nSPEECH_UNDERSTOOD:\n"+understood_speech + "\n REGEX MATCHES:\n"+str(matches)+"\n")
+    global datetimeForLog
+    log_file = open(Path('.') / "atc-archive" / (datetimeForLog + ".txt"),'w')
+    log_file.write("OCR_UNDERSTOOD:\n" + ocr_understood + "\nSPEECH_UNDERSTOOD:\n"+understood_speech + "\n REGEX MATCHES:\n"+str(understood_commands)+"\n")
  
 
     print("understood_commands", understood_commands)
@@ -137,8 +144,8 @@ def with_speech_and_matches():
 
 
     print("Selected " + command_number + ". " + command_label)
-    # log_file.write("Selected " + command_number + ". " + command)
-    # log_file.close()
+    log_file.write("Selected " + command_number + ". " + command)
+    log_file.close()
     print("Press " + str(command_number))
 
     global pressf8
@@ -174,6 +181,9 @@ def on_press(key):
         if key == keyboard.Key.f8 and recording == False:
             global pressf8
             pressf8 = time.perf_counter()
+
+            global datetimeForLog 
+            datetimeForLog = str(math.floor(datetime.datetime.now().timestamp()))
             print("Calling from_mic()")
             recording = True
             t1 = Thread(target=from_mic)
