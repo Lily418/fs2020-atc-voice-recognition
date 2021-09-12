@@ -17,9 +17,17 @@ import datetime
 from pathlib import Path
 import math 
 from threading import Thread
-import concurrent.futures
 import json
+from vosk import Model, KaldiRecognizer, SetLogLevel
+from pathlib import Path
+import sounddevice as sd
+import queue
 
+model = Model("vosk-model")
+
+device_info = sd.query_devices(sd.default.device, 'input')
+samplerate = int(device_info['default_samplerate'])
+rec = KaldiRecognizer(model, samplerate)
 
 menu_item_map = json.loads(open(Path(".") / "menu_item_map.json",'r', encoding="utf8").read())
 
@@ -47,9 +55,6 @@ model = SentenceTransformer('all-MiniLM-L6-v2')
 
 commandRegex = re.compile(r'^([0-9]+) ([A-Z0-9\W]+?)$', re.MULTILINE)
 
-app = Application(backend="uia").connect(title_re=".*Microsoft Flight Simulator.*")
-
-
 # Turn the Blue button background to white
 def process_screenshot(screenshot): 
     screenshot_cropped = ImageOps.crop(screenshot, border=18)
@@ -65,6 +70,7 @@ def process_screenshot(screenshot):
     return atc_invert
 
 def get_commands():
+    app = Application(backend="uia").connect(title_re=".*Microsoft Flight Simulator.*")
     startImageCaptureTime = time.perf_counter()
     atc_image = app.window(handle=pywinauto.findwindows.find_window(title="ATC")).capture_as_image()
     endImageCaptureTime = time.perf_counter()
@@ -174,17 +180,27 @@ def with_speech_and_matches():
 
 
 def from_mic():
-    speech_config = speechsdk.SpeechConfig(subscription=os.environ["AZURE_FS2020_ATC_SPEECH_KEY"], region="uksouth")
-    speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config)
-    
-    print("Speak into your microphone.")
-    result = speech_recognizer.recognize_once()
-    print("Result text: " + result.text)
-    global speechunderstoodtime
-    speechunderstoodtime = time.perf_counter()
-    print(f"Time from f8 to speech understood time {speechunderstoodtime - pressf8:0.4f} seconds")
-    global understood_speech
-    understood_speech = result.text
+
+    q = queue.Queue()
+
+    def callback(indata, frames, time, status):
+        q.put(bytes(indata))
+
+    with sd.RawInputStream(samplerate=samplerate, blocksize = 8000, dtype='int16',
+                        channels=1, callback=callback):
+        print("Speak into your microphone.")
+
+        result = None
+        while result == None:
+            data = q.get()
+            if rec.AcceptWaveform(data):
+                result = json.loads(rec.Result()).get('text')
+
+        global speechunderstoodtime
+        speechunderstoodtime = time.perf_counter()
+        print(f"Time from f8 to speech understood time {speechunderstoodtime - pressf8:0.4f} seconds")
+        global understood_speech
+        understood_speech = result
 
 def on_press(key):
     try:
@@ -213,6 +229,8 @@ def on_press(key):
     except AttributeError:
         print('special key {0} pressed'.format(
             key))
+
+print("Listening")
 
 # Collect events until released
 with keyboard.Listener(
