@@ -138,7 +138,7 @@ def with_speech_and_matches():
 
         # For commands like acknowledgement expected speech is dissimilar
         # from the label text
-        expected_speech = [command[1].upper()] + (menu_item_map[command[1].upper()] or [])
+        expected_speech = [command[1].upper()] + (menu_item_map.get(command[1].upper()) or [])
         expected_speech_embeddings = map(lambda x: model.encode([x]), expected_speech)
         
         for expected_speech_embedding in expected_speech_embeddings:
@@ -209,8 +209,6 @@ def on_press(key):
             t2.join()
 
             with_speech_and_matches()
-        if key == keyboard.Key.esc:
-            return False
             
     except AttributeError:
         print('special key {0} pressed'.format(

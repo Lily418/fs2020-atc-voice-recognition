@@ -5,6 +5,33 @@
         "continue for south departure",
         "continue for west departure",
         "continue for straight out departure"
+    ],
+    "ACKNOWLEDGE PATTERN ENTRY INSTRUCTIONS": [
+        "Enter left base",
+        "Enter right base",
+        "Fly left base",
+        "Fly right base",
+        "Make left base",
+        "Make right base",
+        "Enter left downwind",
+        "Enter right downwind",
+        "Enter left traffic",
+        "Enter right traffic",
+        "Fly left downwind",
+        "Fly right downwind",
+        "Fly left traffic",
+        "Fly right traffic",
+        "Make left downwind",
+        "Make right downwind",
+        "Make left traffic",
+        "Make right traffic",
+        "Fly straight in",
+        "Make straight in"
+    ],
+    "ACKNOWLEDGE GROUND HANDOFF": [
+        "Going to",
+        "For"
     ]
+
 
 }
