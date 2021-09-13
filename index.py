@@ -2,7 +2,6 @@ from PIL import Image, ImageOps
 import pytesseract
 
 import re
-import azure.cognitiveservices.speech as speechsdk
 from sentence_transformers import SentenceTransformer, util
 import os
 from pywinauto.application import Application
@@ -23,11 +22,11 @@ from pathlib import Path
 import sounddevice as sd
 import queue
 
-model = Model("vosk-model")
+vosk_model = Model("vosk-model")
 
 device_info = sd.query_devices(sd.default.device, 'input')
 samplerate = int(device_info['default_samplerate'])
-rec = KaldiRecognizer(model, samplerate)
+rec = KaldiRecognizer(vosk_model, samplerate)
 
 menu_item_map = json.loads(open(Path(".") / "menu_item_map.json",'r', encoding="utf8").read())
 
