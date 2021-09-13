@@ -2,8 +2,8 @@ from PIL import Image, ImageOps
 import pytesseract
 
 import re
+import sentence_transformers
 from sentence_transformers import SentenceTransformer, util
-import os
 from pywinauto.application import Application
 from pynput import keyboard
 from pynput.keyboard import Key, Controller
@@ -17,10 +17,12 @@ from pathlib import Path
 import math 
 from threading import Thread
 import json
-from vosk import Model, KaldiRecognizer, SetLogLevel
+import vosk
+from vosk import Model, KaldiRecognizer
 from pathlib import Path
 import sounddevice as sd
 import queue
+import os
 
 vosk_model = Model("vosk-model")
 
@@ -81,8 +83,14 @@ def get_commands():
     
     print(f"Time from proccessScreenshotTime to endProccessScreenshotTime {endProccessScreenshotTime - proccessScreenshotTime:0.4f} seconds")
 
+
+    loggingFolder = Path('.') / "atc-archive"
+    
+    if not loggingFolder.exists():
+        os.makedirs(loggingFolder)
+
     global datetimeForLog 
-    atc_image.save(Path('.') / "atc-archive" / (str(datetimeForLog) + ".png"), "PNG")
+    atc_image.save(loggingFolder / (str(datetimeForLog) + ".png"), "PNG")
 
     ocrStart = time.perf_counter()
     atc1 = pytesseract.image_to_string(proccessed_atc_image, lang='eng', config=r'--psm 6')
@@ -113,7 +121,10 @@ def with_speech_and_matches():
 
     print("understood_speech" + understood_speech)
 
+    loggingFolder = Path('.') / "atc-archive"
     
+    if not loggingFolder.exists():
+        os.makedirs(loggingFolder)
 
     global datetimeForLog
     log_file = open(Path('.') / "atc-archive" / (datetimeForLog + ".txt"),'w')
