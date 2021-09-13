@@ -1,5 +1,4 @@
 from pathlib import Path
-import json
 import re
 import json
 
@@ -14,7 +13,6 @@ with open(p,'r', encoding="utf8") as f:
         for rule in filter_rules:
             if re.search(rule, item[0]):
                 locPak["LocalisationPackage"]["Strings"][item[0]] = ""
-                pass
         if replaceMap.get(item[0]) != None:
              locPak["LocalisationPackage"]["Strings"][item[0]] = replaceMap.get(item[0])
 
